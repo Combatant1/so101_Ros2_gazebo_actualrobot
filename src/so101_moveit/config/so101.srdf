@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<robot name="so101">
+
+    <group name="arm">
+        <joint name="virtual_world_joint"/>
+
+        <joint name="wrist_roll"/>
+        <joint name="wrist_flex"/>
+        <joint name="elbow_flex"/>
+        <joint name="shoulder_lift"/>
+        <joint name="shoulder_pan"/>
+    </group>
+    <group name="gripper">
+        <joint name="gripper"/>
+    </group>
+    
+    <group_state name="home" group="arm">
+        <joint name="wrist_roll" value="0"/>
+        <joint name="wrist_flex" value="0"/>
+        <joint name="elbow_flex" value="0"/>
+        <joint name="shoulder_lift" value="0"/>
+        <joint name="shoulder_pan" value="0"/>
+    </group_state>
+    <group_state name="home" group="gripper">
+        <joint name="gripper" value="0"/>
+    </group_state>
+    
+    <disable_collisions link1="base_link" link2="shoulder_link" reason="Adjacent"/>
+    <disable_collisions link1="base_link" link2="upper_arm_link" reason="Never"/>
+    <disable_collisions link1="gripper_link" link2="lower_arm_link" reason="Never"/>
+    <disable_collisions link1="gripper_link" link2="moving_jaw_so101_v1_link" reason="Adjacent"/>
+    <disable_collisions link1="gripper_link" link2="wrist_link" reason="Adjacent"/>
+    <disable_collisions link1="lower_arm_link" link2="moving_jaw_so101_v1_link" reason="Never"/>
+    <disable_collisions link1="lower_arm_link" link2="upper_arm_link" reason="Adjacent"/>
+    <disable_collisions link1="lower_arm_link" link2="wrist_link" reason="Adjacent"/>
+    <disable_collisions link1="moving_jaw_so101_v1_link" link2="wrist_link" reason="Never"/>
+    <disable_collisions link1="shoulder_link" link2="upper_arm_link" reason="Adjacent"/>
+</robot>
