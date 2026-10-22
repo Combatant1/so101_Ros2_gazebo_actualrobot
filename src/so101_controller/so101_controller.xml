@@ -1,0 +1,10 @@
+<library path="so101_controller">
+    <class name="so101_controller/So101Interface"
+      type="so101_controller::So101Interface"
+      base_class_type="hardware_interface::SystemInterface"
+    >
+      <description>
+        So101 Hardware Interface
+      </description>
+    </class>
+  </library>
