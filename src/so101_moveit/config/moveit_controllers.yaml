@@ -1,5 +1,12 @@
 moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControllerManager
 
+# With real feedback the measured start state can differ slightly from the planned one
+# (servo resolution, gravity sag). The MoveIt default of 0.01 rad is too strict for that.
+trajectory_execution:
+  allowed_execution_duration_scaling: 1.5
+  allowed_goal_duration_margin: 1.0
+  allowed_start_tolerance: 0.05
+
 moveit_simple_controller_manager:
   controller_names:
     - arm_controller

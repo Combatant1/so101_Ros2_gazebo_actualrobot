@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from ament_index_python.packages import get_package_share_directory
+from ament_index_python.packages import get_package_prefix, get_package_share_directory
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, SetEnvironmentVariable
@@ -22,6 +22,27 @@ def generate_launch_description():
     gazebo_resource_path = SetEnvironmentVariable(
         name="GZ_SIM_RESOURCE_PATH",
         value=[str(Path(so101_description_dir).parent.resolve())]
+    )
+
+    gazebo_plugin_path = os.path.join(
+        get_package_prefix("gz_ros2_control"),
+        "lib",
+    )
+    for plugin_path_variable in (
+        "IGN_GAZEBO_SYSTEM_PLUGIN_PATH",
+        "GZ_SIM_SYSTEM_PLUGIN_PATH",
+    ):
+        os.environ[plugin_path_variable] = os.pathsep.join(
+            filter(None, [os.environ.get(plugin_path_variable), gazebo_plugin_path])
+        )
+
+    ignition_plugin_path = SetEnvironmentVariable(
+        name="IGN_GAZEBO_SYSTEM_PLUGIN_PATH",
+        value=[gazebo_plugin_path],
+    )
+    gz_plugin_path = SetEnvironmentVariable(
+        name="GZ_SIM_SYSTEM_PLUGIN_PATH",
+        value=[gazebo_plugin_path],
     )
 
     ros_distro = os.environ["ROS_DISTRO"]
@@ -75,6 +96,8 @@ def generate_launch_description():
     return LaunchDescription([
         model_arg,
         gazebo_resource_path,
+        ignition_plugin_path,
+        gz_plugin_path,
         robot_state_publisher,
         gazebo,
         gz_spawn_entity,

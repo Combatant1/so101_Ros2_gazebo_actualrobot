@@ -10,12 +10,17 @@ from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
 
-    is_sim_arg = DeclareLaunchArgument(
-        "is_sim",
-        default_value="True"
+    is_sim_arg = DeclareLaunchArgument("is_sim", default_value="True")
+    # Real-robot options (ignored in simulation)
+    port_arg = DeclareLaunchArgument("port", default_value="/dev/ttyUSB0")
+    read_only_arg = DeclareLaunchArgument(
+        "read_only", default_value="false",
+        description="true = read servo positions only, never enable torque or send commands",
     )
 
     is_sim = LaunchConfiguration("is_sim")
+    port = LaunchConfiguration("port")
+    read_only = LaunchConfiguration("read_only")
 
     robot_description = ParameterValue(
         Command(
@@ -25,7 +30,10 @@ def generate_launch_description():
                     get_package_share_directory("so101_description"),
                     "urdf",
                     "so101.urdf.xacro",
-                )," is_sim:=False"
+                ),
+                " is_sim:=", is_sim,
+                " port:=", port,
+                " read_only:=", read_only,
             ]
         ),
         value_type=str,
@@ -78,6 +86,8 @@ def generate_launch_description():
     return LaunchDescription(
         [
             is_sim_arg,
+            port_arg,
+            read_only_arg,
             robot_state_publisher_node,
             controller_manager,
             joint_state_broadcaster_spawner,

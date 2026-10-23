@@ -1,12 +1,11 @@
 controller_manager:
   ros__parameters:
-    update_rate: 1000 # in Hz
+    # The 115200-baud USB link to the ESP32 is the limit on the real robot: one sync-read +
+    # one sync-write take ~8 ms. 50 Hz leaves margin. (Also used by the simulation.)
+    update_rate: 50 # in Hz
 
     arm_controller:
       type: joint_trajectory_controller/JointTrajectoryController
-
-    # gripper_controller:
-    #   type: forward_command_controller/ForwardCommandController
 
     gripper_controller:
       type: joint_trajectory_controller/JointTrajectoryController
@@ -29,21 +28,47 @@ arm_controller:
     state_interfaces:
       - position
 
-    open_loop_control: true
-    allow_integration_in_goal_trajectories: true
+    # CLOSED LOOP: trajectories start from the measured joint state and the goal is checked
+    # against it. (The servo's own PID still does the actual position control.)
+    open_loop_control: false
+
+    state_publish_rate: 50.0
+    action_monitor_rate: 20.0
+
+    constraints:
+      # No velocity state is available, so do not check stopped velocity.
+      stopped_velocity_tolerance: 0.0
+      # Extra time (s) allowed after the trajectory ends for the arm to settle.
+      goal_time: 1.0
+      # Goal tolerance in rad. 0.1 rad = ~5.7 deg is deliberately loose for first bring-up
+      # (gravity sag on shoulder_lift / elbow_flex). Tighten once you have measured it.
+      # Path ("trajectory") tolerance is left unset = not checked.
+      wrist_roll:     {goal: 0.1}
+      wrist_flex:     {goal: 0.1}
+      elbow_flex:     {goal: 0.1}
+      shoulder_lift:  {goal: 0.1}
+      shoulder_pan:   {goal: 0.1}
 
 gripper_controller:
   ros__parameters:
     joints:
       - gripper
-      
-    # interface_name: position
-      
+
     command_interfaces:
       - position
 
     state_interfaces:
       - position
 
-    open_loop_control: true
-    allow_integration_in_goal_trajectories: true
+    open_loop_control: false
+
+    state_publish_rate: 50.0
+    action_monitor_rate: 20.0
+
+    constraints:
+      stopped_velocity_tolerance: 0.0
+      goal_time: 1.0
+      # A closing gripper that is blocked by an object never reaches its commanded position.
+      # goal: 0.0 disables the goal check for the gripper so grasping does not abort the action.
+      # (Squeeze force is limited separately by torque_limit in so101_ros2_control.xacro.)
+      gripper: {goal: 0.0}

@@ -1,82 +1,122 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="arduinobot">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="so101">
+
+    <!-- Arguments forwarded from the launch iles (only used when is_sim = false) -->
+    <xacro:arg name="port" default="/dev/ttyUSB0"/>
+    <xacro:arg name="read_only" default="false"/>
 
     <ros2_control name="RobotSystem" type="system">
 
         <xacro:if value="$(arg is_sim)">
-            <hardware>
-                <plugin>gazebo_ros2_control/GazeboSystem</plugin>
-            </hardware>
+            <xacro:if value="$(arg is_ignition)">
+                <!-- ROS 2 Humble + Ignition -->
+                <hardware>
+                    <plugin>ign_ros2_control/IgnitionSystem</plugin>
+                </hardware>
+            </xacro:if>
+            <xacro:unless value="$(arg is_ignition)">
+                <!-- ROS 2 Iron or newer + gz sim -->
+                <hardware>
+                    <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+                </hardware>
+            </xacro:unless>
         </xacro:if>
 
+        <!-- Real robot  -->
         <xacro:unless value="$(arg is_sim)">
             <hardware>
                 <plugin>so101_controller/So101Interface</plugin>
-                <param name="port" value="/dev/ttyUSB0"/>
+                <param name="port">$(arg port)</param>
+                <param name="baud_rate">115200</param>
+                <param name="read_only">$(arg read_only)</param>
+                <param name="startup_delay">2.0</param>
+                <param name="timeout_ms">20</param>
+                <param name="read_health">false</param>
+                <param name="acceleration">254</param>
+                <param name="disable_torque_on_deactivate">false</param>
+                <param name="bus_echo">false</param>
+                <param name="max_consecutive_failures">20</param>
             </hardware>
         </xacro:unless>
 
-        <!-- ROS 2 Humble -->
-        <!-- <xacro:if value="$(arg is_ignition)">
-            <hardware>
-                <plugin>ign_ros2_control/IgnitionSystem</plugin>
-            </hardware>
-        </xacro:if>
-
-        <!-- ROS 2 Iron or above -->
-        <xacro:unless value="$(arg is_ignition)">
-            <hardware>
-                <plugin>gz_ros2_control/GazeboSimSystem</plugin>
-            </hardware>
-        </xacro:unless> -->
 
         <joint name="gripper">
             <command_interface name="position">
-            <param name="min">-0.174533</param>
-            <param name="max">1.74533</param>
+                <param name="min">-0.174533</param>
+                <param name="max">1.74533</param>
             </command_interface>
             <state_interface name="position"/>
+            <param name="id">6</param>
+            <param name="zero_tick">2039</param>
+            <param name="min_tick">2039</param>
+            <param name="max_tick">3534</param>
+            <param name="direction">1</param>
+            <param name="torque_limit">500</param>
         </joint>
-
 
         <joint name="wrist_roll">
             <command_interface name="position">
-            <param name="min">-2.74385</param>
-            <param name="max">2.84121</param>
+                <param name="min">-2.74385</param>
+                <param name="max">2.84121</param>
             </command_interface>
             <state_interface name="position"/>
+            <param name="id">5</param>
+            <param name="zero_tick">2047.5</param>
+            <param name="min_tick">0</param>
+            <param name="max_tick">4095</param>
+            <param name="direction">1</param>
         </joint>
 
         <joint name="wrist_flex">
             <command_interface name="position">
-            <param name="min">-1.65806</param>
-            <param name="max">1.65806</param>
+                <param name="min">-1.65806</param>
+                <param name="max">1.65806</param>
             </command_interface>
             <state_interface name="position"/>
+            <param name="id">4</param>
+            <param name="zero_tick">2009.5</param>
+            <param name="min_tick">834</param>
+            <param name="max_tick">3185</param>
+            <param name="direction">1</param>
         </joint>
 
         <joint name="elbow_flex">
             <command_interface name="position">
-            <param name="min">-1.69</param>
-            <param name="max">1.69</param>
+                <param name="min">-1.69</param>
+                <param name="max">1.69</param>
             </command_interface>
             <state_interface name="position"/>
+            <param name="id">3</param>
+            <param name="zero_tick">1921</param>
+            <param name="min_tick">801</param>
+            <param name="max_tick">3041</param>
+            <param name="direction">1</param>
         </joint>
 
         <joint name="shoulder_lift">
             <command_interface name="position">
-            <param name="min">-1.74533</param>
-            <param name="max">1.74533</param>
+                <param name="min">-1.74533</param>
+                <param name="max">1.74533</param>
             </command_interface>
             <state_interface name="position"/>
+            <param name="id">2</param>
+            <param name="zero_tick">2085</param>
+            <param name="min_tick">909</param>
+            <param name="max_tick">3261</param>
+            <param name="direction">1</param>
         </joint>
 
         <joint name="shoulder_pan">
             <command_interface name="position">
-            <param name="min">-1.91986</param>
-            <param name="max">1.91986</param>
+                <param name="min">-1.91986</param>
+                <param name="max">1.91986</param>
             </command_interface>
             <state_interface name="position"/>
+            <param name="id">1</param>
+            <param name="zero_tick">2133.5</param>
+            <param name="min_tick">792</param>
+            <param name="max_tick">3475</param>
+            <param name="direction">1</param>
         </joint>
 
     </ros2_control>
