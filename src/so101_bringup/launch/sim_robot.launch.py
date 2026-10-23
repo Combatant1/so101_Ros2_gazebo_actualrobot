@@ -31,18 +31,8 @@ def generate_launch_description():
             launch_arguments={"is_sim": "True"}.items()
         )
     
-    remote_interface = IncludeLaunchDescription(
-            os.path.join(
-                get_package_share_directory("so101_remote_control"),
-                "launch",
-                "remote_interface.launch.py"
-            ),
-            launch_arguments={"is_sim": "True"}.items()
-        )
-    
     return LaunchDescription([
         gazebo,
         controller,
         moveit,
-        remote_interface
     ])
