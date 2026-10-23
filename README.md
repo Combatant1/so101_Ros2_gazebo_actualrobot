@@ -184,6 +184,19 @@ Calibration parameters are stored in:
 src/so101_description/urdf/so101_ros2_control.xacro
 ```
 
+Generate the per-joint parameter blocks from your LeRobot calibration JSON:
+
+```bash
+cd ~/so101_ws
+python3 tools/calib_to_xacro.py \
+  ~/.cache/huggingface/lerobot/calibration/robots/so101_follower/<id>.json
+```
+
+Copy the generated blocks into the matching joints in
+`src/so101_description/urdf/so101_ros2_control.xacro`. The script leaves
+`direction` set to `1`; verify each joint in read-only mode and change it to
+`-1` if the model moves in the opposite direction.
+
 The relevant convention is:
 
 - Arm joint `zero_tick`: midpoint of `range_min` and `range_max`
