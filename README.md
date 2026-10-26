@@ -15,16 +15,22 @@ measured pose.
 
 ## Current status
 
-| Capability | ROS 2 Humble |
-|---|---|
-| Real arm read-only launch | Tested |
-| Real arm closed-loop control | Tested |
-| MoveIt execution on real arm | Tested from a non-folded pose |
-| Robot model spawning in Gazebo | Tested |
-| Gazebo controller startup and motion | Needs verification on the target machine |
-| ROS 2 Jazzy | Not tested |
+This workspace is intended to support both ROS 2 Humble and ROS 2 Jazzy.
+Humble is the currently verified environment; Jazzy is supported by the
+distribution-specific dependency and Gazebo selections but still needs a
+full end-to-end validation run.
 
-Use ROS 2 Humble on Ubuntu 22.04 for the known-tested real-robot setup.
+| Capability | ROS 2 Humble | ROS 2 Jazzy |
+|---|---|---|
+| Workspace dependencies and build | Verified | Supported target; validate locally |
+| Real arm read-only launch | Tested | Supported target; validate locally |
+| Real arm closed-loop control | Tested | Supported target; validate locally |
+| MoveIt execution on real arm | Tested from a non-folded pose | Supported target; validate locally |
+| Robot model spawning in Gazebo | Tested | Supported target; validate locally |
+| Gazebo controller startup and motion | Needs verification on target machine | Needs verification |
+
+Use Ubuntu 22.04 with Humble or Ubuntu 24.04 with Jazzy, following the
+matching setup section below.
 
 ## Project media
 
@@ -82,7 +88,7 @@ control; this project does not add a ROS-side PID loop.
 - SO-101 arm with six Feetech STS3215 servos.
 - Waveshare ESP32 servo driver board.
 - Separate servo power supply. USB does not power the servos.
-- Ubuntu 22.04 with ROS 2 Humble.
+- Ubuntu 22.04 with ROS 2 Humble or Ubuntu 24.04 with ROS 2 Jazzy.
 - A LeRobot calibration JSON for the arm.
 
 Servo IDs are expected to be:
@@ -148,11 +154,59 @@ colcon build --symlink-install
 source install/setup.bash
 ```
 
+## Install ROS 2 Jazzy dependencies
+
+Install ROS 2 Jazzy on Ubuntu 24.04 using the
+[official instructions](https://docs.ros.org/en/jazzy/Installation.html).
+Then install the project dependencies:
+
+```bash
+sudo apt update
+sudo apt install -y \
+  ros-jazzy-ros2-control \
+  ros-jazzy-ros2-controllers \
+  ros-jazzy-moveit \
+  ros-jazzy-xacro \
+  ros-jazzy-ros-gz \
+  ros-jazzy-gz-ros2-control \
+  libserial-dev \
+  python3-serial \
+  python3-colcon-common-extensions \
+  python3-rosdep \
+  python3-flask
+```
+
+Build the workspace with the Jazzy environment sourced:
+
+```bash
+cd ~/so101_ws
+sudo rosdep init 2>/dev/null || true
+rosdep update
+rosdep install --from-paths src --ignore-src -r -y
+
+source /opt/ros/jazzy/setup.bash
+colcon build --symlink-install
+source install/setup.bash
+```
+
+On Jazzy, Gazebo uses `gz_ros2_control` and the `gz_ros2_control-system`
+plugin branch selected by the launch and xacro files. If a package or plugin
+cannot be found, check the installed package with:
+
+```bash
+source /opt/ros/jazzy/setup.bash
+ros2 pkg prefix gz_ros2_control
+```
+
+The real-robot protocol and hardware interface are intended to be shared
+between Humble and Jazzy. Validate the complete read-only and closed-loop
+bring-up on Jazzy before relying on it for hardware operation.
+
 For every new shell:
 
 ```bash
 cd ~/so101_ws
-source /opt/ros/humble/setup.bash
+source /opt/ros/$ROS_DISTRO/setup.bash
 source install/setup.bash
 ```
 
@@ -428,11 +482,12 @@ ros2 daemon start
 
 ### Gazebo controller manager is unavailable
 
-Check that the simulation launch is using the correct Humble control plugin:
+Check that the simulation launch is using the control plugin for your ROS 2
+distribution:
 
 ```bash
-ros2 pkg prefix ign_ros2_control
-ros2 pkg prefix gz_ros2_control
+ros2 pkg prefix ign_ros2_control  # Humble
+ros2 pkg prefix gz_ros2_control   # Jazzy
 ros2 service list | grep controller_manager
 ```
 
@@ -464,7 +519,7 @@ git diff --check
 ## Roadmap
 
 - Verify and harden Gazebo controller startup on clean Humble and Jazzy installs.
-- Test the stack on ROS 2 Jazzy.
+- Complete full end-to-end validation on ROS 2 Jazzy.
 - Add CI builds for Humble and Jazzy.
 - Add stable udev naming for the USB adapter.
 - Measure real cycle timing, settling error, and servo temperature.
