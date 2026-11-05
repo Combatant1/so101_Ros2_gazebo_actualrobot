@@ -44,7 +44,6 @@ planning, Gazebo simulation, and digital-twin motion:
 <video src="Media/Videos/MOveit_planner_actual_robot.mp4" width="" controls></video>
 
 
-- [MoveIt planner controlling the actual robot](Media/Videos/MOveit_planner_actual_robot.mp4)
 
 These MP4 files are downloadable from GitHub. If GitHub does not display a
 video inline in the browser, select the link to open or download it.
