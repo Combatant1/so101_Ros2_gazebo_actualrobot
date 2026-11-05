@@ -37,10 +37,13 @@ matching setup section below.
 The repository includes short demonstrations of the real arm, MoveIt
 planning, Gazebo simulation, and digital-twin motion:
 
-- [Actual robot gripper](Media/Videos/ACtual_robot_gripper.mp4)
-- [Actual robot MoveIt execution](Media/Videos/Actual_robot_moveit.mp4)
-- [Digital-twin motion mimicry](Media/Videos/Digital_twin_motion_mimicry.mp4)
-- [Gazebo simulation with joint feedback](Media/Videos/Gazebo_sim_w_joint_feedback.mp4)
+<video src="Media/Videos/ACtual_robot_gripper.mp4" width="" controls></video>
+<video src="Media/Videos/Actual_robot_moveit.mp4" width="" controls></video>
+<video src="Media/Videos/Digital_twin_motion_mimicry.mp4" width="" controls></video>
+<video src="Media/Videos/Gazebo_sim_w_joint_feedback.mp4" width="" controls></video>
+<video src="Media/Videos/MOveit_planner_actual_robot.mp4" width="" controls></video>
+
+
 - [MoveIt planner controlling the actual robot](Media/Videos/MOveit_planner_actual_robot.mp4)
 
 These MP4 files are downloadable from GitHub. If GitHub does not display a
